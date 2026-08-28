@@ -1,0 +1,5 @@
+# Run transcripts contain user details - never commit them
+logs/
+
+# Local-only role templates with real group/license names, if you keep one
+*.local.json
