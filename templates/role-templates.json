@@ -1,0 +1,40 @@
+{
+  "_comment": "Role templates for New-EmployeeOnboard.ps1. Group names must match Entra ID group display names exactly (and be unique). License values are SKU part numbers - list your tenant's with Get-MgSubscribedSku | Select SkuPartNumber.",
+  "roles": {
+    "sales-rep": {
+      "department": "Sales",
+      "jobTitle": "Sales Representative",
+      "groups": [
+        "All Employees",
+        "Sales Team",
+        "CRM Users"
+      ],
+      "licenses": [
+        "O365_BUSINESS_PREMIUM"
+      ]
+    },
+    "service-tech": {
+      "department": "Service",
+      "jobTitle": "Service Technician",
+      "groups": [
+        "All Employees",
+        "Service Team",
+        "Field Devices"
+      ],
+      "licenses": [
+        "O365_BUSINESS_ESSENTIALS"
+      ]
+    },
+    "office-admin": {
+      "department": "Administration",
+      "jobTitle": "Office Administrator",
+      "groups": [
+        "All Employees",
+        "Office Staff"
+      ],
+      "licenses": [
+        "O365_BUSINESS_PREMIUM"
+      ]
+    }
+  }
+}
