@@ -36,7 +36,7 @@
         User.Read.All, Group.Read.All, Directory.Read.All, AuditLog.Read.All
     Required modules:
         Microsoft.Graph.Users, Microsoft.Graph.Groups,
-        Microsoft.Graph.Identity.DirectoryManagement
+        Microsoft.Graph.Applications, Microsoft.Graph.Identity.DirectoryManagement
 #>
 [CmdletBinding()]
 param(
@@ -50,8 +50,18 @@ if (-not (Get-MgContext)) {
     Connect-MgGraph -Scopes 'User.Read.All','Group.Read.All','Directory.Read.All','AuditLog.Read.All' -NoWelcome
 }
 
-$user = Get-MgUser -UserId $UserPrincipalName -Property Id,DisplayName,UserPrincipalName,AccountEnabled,AssignedLicenses,SignInActivity
-if (-not $user) { throw "User '$UserPrincipalName' not found." }
+# SignInActivity can only be $select-ed when querying by object id (GUID),
+# not by UPN - resolve the UPN first, then fetch by id.
+if ($UserPrincipalName -match '^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$') {
+    $userId = $UserPrincipalName
+}
+else {
+    $upnSafe = $UserPrincipalName -replace "'", "''"
+    $found = @(Get-MgUser -Filter "userPrincipalName eq '$upnSafe'" -Property Id -ErrorAction SilentlyContinue)
+    if (-not $found -or -not $found[0]) { throw "User '$UserPrincipalName' not found." }
+    $userId = $found[0].Id
+}
+$user = Get-MgUser -UserId $userId -Property Id,DisplayName,UserPrincipalName,AccountEnabled,AssignedLicenses,SignInActivity
 
 #region Collect
 $memberships = Get-MgUserMemberOf -UserId $user.Id -All
