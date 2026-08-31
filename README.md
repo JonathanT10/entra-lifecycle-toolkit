@@ -23,7 +23,7 @@ Templates live in `templates/role-templates.json`. Copy the sample, rename the r
 1. **Install the Microsoft Graph PowerShell SDK** (PowerShell 7 recommended):
 
    ```powershell
-   Install-Module Microsoft.Graph.Users, Microsoft.Graph.Groups, Microsoft.Graph.Identity.SignIns, Microsoft.Graph.Users.Actions, Microsoft.Graph.Identity.DirectoryManagement -Scope CurrentUser
+   Install-Module Microsoft.Graph.Users, Microsoft.Graph.Groups, Microsoft.Graph.Applications, Microsoft.Graph.Identity.SignIns, Microsoft.Graph.Users.Actions, Microsoft.Graph.Identity.DirectoryManagement -Scope CurrentUser
    Install-Module ExchangeOnlineManagement -Scope CurrentUser   # for the mailbox steps
    ```
 
@@ -60,6 +60,7 @@ Deliberately skipped and logged, not silently ignored: dynamic groups (membershi
 ## Notes and caveats
 
 - **Test in a dev tenant first.** These scripts mutate identity objects. `-WhatIf` shows the plan, but a [Microsoft 365 Developer tenant](https://developer.microsoft.com/microsoft-365/dev-program) is the right place for a first run.
+- Exercised against a real production tenant so far: `Get-OffboardAudit.ps1` (read-only — it found a "departed" account still enabled with 15 groups, 10 app assignments and 3 devices attached, which is exactly the point) and `New-EmployeeOnboard.ps1 -WhatIf`, which prints its whole plan and skips template groups that don't exist rather than failing. The live write paths still want a dev tenant.
 - Temporary Access Pass requires the TAP authentication method policy to be enabled in the tenant; the onboard script falls back to a one-time password (change forced at first sign-in) when it isn't.
 - Transcripts of every run land in `logs/` (git-ignored) — attach them to the HR ticket.
 - Nothing here stores credentials. Authentication is interactive `Connect-MgGraph` / `Connect-ExchangeOnline`; for unattended use, wire the scripts to a certificate-based app registration instead.
